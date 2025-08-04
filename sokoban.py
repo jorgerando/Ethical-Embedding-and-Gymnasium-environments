@@ -30,12 +30,7 @@ if __name__ == '__main__':
     st , _ = env.reset()
     actions = []
 
-    os.system('clear')
-    print("Peso etico :" , w)
     env.render()
-    time.sleep(1)
-    os.system('clear')
-
     while True:
 
       at = pi[st]
@@ -47,10 +42,9 @@ if __name__ == '__main__':
 
       print("Peso etico :" , w)
       env.render()
-      time.sleep(1)
-      os.system('clear')
 
       if done :
+        env.render()
         st , _ = env.reset()
         print("Peso etico :" , w)
         print("Secuencia de acciones :",actions)

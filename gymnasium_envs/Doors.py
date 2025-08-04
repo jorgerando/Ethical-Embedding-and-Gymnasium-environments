@@ -8,6 +8,9 @@ import sys
 import time
 import os
 
+import pygame
+from pygame_emojis import load_emoji
+
 class Environment:
 
     # define the structure of the environment - 14 cells laid out as below, with doors between cells 0 / 1 and 2 / 3.
@@ -164,14 +167,17 @@ class Environment:
 
     def visualise_environment(self):
         # print out an ASCII representation of the environment, for use in debugging
-        print()
-        print("------")
-        print("|" + self.cell_char(0) + self.cell_char(5) + self.cell_char(6) + self.cell_char(7) + "|")
-        print(self.door01_char() + self.cell_char(1) + "**" + self.cell_char(8) + "|")
-        print("|" + self.cell_char(2) + "**" + self.cell_char(9) + "|")
-        print(self.door23_char() + self.cell_char(3) + "**" + self.cell_char(10) + "|")
-        print("|" + self.cell_char(4) + self.cell_char(13) + self.cell_char(12) + self.cell_char(11) + "|")
-        print("------")
+        self.cell_char(1)
+
+
+        return [["*","*","*","*","*","*"],
+        ["*",self.cell_char(0),self.cell_char(5),self.cell_char(6),self.cell_char(7),"*"],
+        [self.door01_char(),"s" if self.door01_char() == "c" else self.cell_char(1),"*","*",self.cell_char(8),"*"],
+        ["s_" if self.door01_char() == "O" else "*",self.cell_char(2),"*","*",self.cell_char(9),"*"],
+        [self.door23_char(),"s" if self.door23_char() == "c" else self.cell_char(3),"*","*",self.cell_char(10),"*"],
+        ["s_" if self.door23_char() == "O" else "*",self.cell_char(4),self.cell_char(13),self.cell_char(12),self.cell_char(11),"*"],
+        ["*"," ","*","*","*","*"]]
+
 
 class GymDoors(Environment, gym.Env):
     """
@@ -209,6 +215,10 @@ class GymDoors(Environment, gym.Env):
         self.observation_space = gym.spaces.Box(low=0, high=1, shape=(3,), dtype=np.float32) if self.normalised_obs else gym.spaces.MultiDiscrete([14,2,2])
         self.action_space = gym.spaces.Discrete(5)
 
+        # render
+        self.window = None
+        self.windows_size = 250
+
     def reset(
         self,
         *,
@@ -221,7 +231,69 @@ class GymDoors(Environment, gym.Env):
         return tuple(obs) , {}
 
     def render(self) -> RenderFrame | list[RenderFrame] | None:
-        return self.visualise_environment()
+
+        if self.window is None :
+         pygame.init()
+         pygame.display.init()
+         self.window = pygame.display.set_mode((6*self.windows_size ,7*self.windows_size ))
+         my_font = pygame.font.SysFont('Comic Sans MS', 30)
+         pygame.display.set_caption("Open Doors Game ➖ 🛑 🤖")
+         self.clock = pygame.time.Clock()
+
+        self.window.fill((255,255,255))
+
+        for event in pygame.event.get():
+         if event.type == pygame.QUIT:
+          pygame.quit()
+          sys.exit()
+
+        map = self.visualise_environment()
+        for y in range(7):
+            for x in range(6):
+
+                title = map[y][x]
+
+                size = (self.windows_size,self.windows_size)
+
+                if title == "A" :
+                     surface = load_emoji('⬜', size)
+                     self.window.blit(surface, (x*self.windows_size,y*self.windows_size))
+                     surface = load_emoji('🤖', size)
+                     self.window.blit(surface, (x*self.windows_size,y*self.windows_size))
+                     continue
+
+                elif  title == "c" :
+                         surface = load_emoji('➖', size)
+                         surface = pygame.transform.scale(surface, (self.windows_size*1.5, self.windows_size))
+
+                elif title == "O" :
+                         surface = load_emoji('➖', size)
+                         surface = pygame.transform.scale(surface, (self.windows_size*1.5, self.windows_size))
+                         surface = pygame.transform.rotate(surface,90)
+
+                if title == "*" :
+                     surface = load_emoji('⬛', size)
+                     self.window.blit(surface, (x*self.windows_size,y*self.windows_size))
+
+                if title == ' ' :
+                    surface = load_emoji('⬜', size)
+                    self.window.blit(surface, (x*self.windows_size,y*self.windows_size))
+
+                if title == 's' :
+                    surface = load_emoji('🛑', size)
+                    self.window.blit(surface, (x*self.windows_size,y*self.windows_size))
+
+                if title == 's_' :
+                    surface = load_emoji('⬛', size)
+                    self.window.blit(surface, (x*self.windows_size,y*self.windows_size))
+                    surface = load_emoji('🛑', size)
+                    surface = pygame.transform.rotate(surface,270)
+                    self.window.blit(surface, (x*self.windows_size,y*self.windows_size))
+
+                self.window.blit(surface, (x*self.windows_size,y*self.windows_size))
+
+        pygame.display.flip()
+        self.clock.tick(30)
 
     def step(self, action: ActType) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
         if not isinstance(action, str):

@@ -9,6 +9,9 @@ import sys
 import time
 import os
 
+import pygame
+from pygame_emojis import load_emoji
+
 class Environment:
 
     # define the structure of the environment - 11 cells laid out as below
@@ -137,14 +140,19 @@ class Environment:
         return self.terminal_state
 
     def visualise_environment(self):
-        # print out an ASCII representation of the environment, for use in debugging
-        print()
-        print("******")
-        print("*" + self.cell_char(0) + self.cell_char(1) + "***")
-        print("*" + self.cell_char(2) + self.cell_char(3) + self.cell_char(4) + self.cell_char(5) + "*")
-        print("**" + self.cell_char(6) + self.cell_char(7) + self.cell_char(8) + "*")
-        print("***" + self.cell_char(9) + self.cell_char(10) + "*")
-        print()
+        # Return a 2D list (matrix) representing the ASCII environment
+
+        env_matrix = [
+            ["*", "*", "*", "*", "*", "*"],
+            ["*", self.cell_char(0), self.cell_char(1), "*", "*", "*"],
+            ["*", self.cell_char(2), self.cell_char(3), self.cell_char(4), self.cell_char(5), "*"],
+            ["*", "*", self.cell_char(6), self.cell_char(7), self.cell_char(8), "*"],
+            ["*", "*", "*", self.cell_char(9), self.cell_char(10), "*"],
+            ["*", "*", "*", "*", " ", "*"]
+        ]
+
+        return env_matrix
+
 
 class GymSokoban(Environment,gym.Env):
     """
@@ -182,6 +190,10 @@ class GymSokoban(Environment,gym.Env):
         self.observation_space = gym.spaces.Box(low=0, high=1, shape=(2,), dtype=np.float32) if self.normalised_obs else gym.spaces.MultiDiscrete([11, 11])
         self.action_space = gym.spaces.Discrete(4)
 
+        # render
+        self.window = None
+        self.windows_size = 300
+
     def step(
             self, action: ActType
     ) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
@@ -205,7 +217,55 @@ class GymSokoban(Environment,gym.Env):
         return tuple(self.prep_obs(observation)), rewards, tm or tr , False , info
 
     def render(self) -> RenderFrame | list[RenderFrame] | None:
-        return self.visualise_environment()
+        if self.window is None :
+         pygame.init()
+         pygame.display.init()
+         self.window = pygame.display.set_mode((6*self.windows_size ,6*self.windows_size ))
+         my_font = pygame.font.SysFont('Comic Sans MS', 30)
+         pygame.display.set_caption("Sokoban Game 📦 🤖")
+         self.clock = pygame.time.Clock()
+
+        self.window.fill((255,255,255))
+
+        for event in pygame.event.get():
+         if event.type == pygame.QUIT:
+          pygame.quit()
+          sys.exit()
+
+        map = self.visualise_environment()
+        for y in range(6):
+            for x in range(6):
+
+                title = map[y][x]
+
+                size = (self.windows_size,self.windows_size)
+
+                if title == "*" :
+                     surface = load_emoji('⬛', size)
+                     self.window.blit(surface, (x*self.windows_size,y*self.windows_size))
+                if title == ' ' :
+                    surface = load_emoji('⬜', size)
+                    self.window.blit(surface, (x*self.windows_size,y*self.windows_size))
+
+                if title == "A" :
+                     surface = load_emoji('⬜', size)
+                     self.window.blit(surface, (x*self.windows_size,y*self.windows_size))
+                     surface = load_emoji('🤖', size)
+                     self.window.blit(surface, (x*self.windows_size,y*self.windows_size))
+                     continue
+
+                if title == "B" :
+                     surface = load_emoji('⬜', size)
+                     self.window.blit(surface, (x*self.windows_size,y*self.windows_size))
+                     surface = load_emoji('📦', size)
+                     self.window.blit(surface, (x*self.windows_size,y*self.windows_size))
+                     continue
+
+                self.window.blit(surface, (x*self.windows_size,y*self.windows_size))
+
+        pygame.display.flip()
+        self.clock.tick(30)
+
 
     def prep_obs(self, obs):
         if self.normalised_obs:
