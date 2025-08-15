@@ -6,13 +6,17 @@ from OLS_Embding import *
 from gymnasium_envs.PublicCivilityGame import *
 
 ITERATIONS = 80000
+
 GAMMA = 0.7
+EPSILON = 0.5
+ALFA = 0.7
+
 EPISODES = 10
 
 env = PublicCivilityGame()
 
 #Calculo del convex hull
-S = OLS3(env , gamma=GAMMA, iterations=ITERATIONS ,episodes=EPISODES )
+S = OLS3(env ,  gamma=GAMMA , epsilon=EPSILON , alfa=ALFA , iterations=ITERATIONS ,episodes=EPISODES )
 
 # extraccion de las politicas eticas obtimas
 S_ = ethical_optimal_extraction(S)

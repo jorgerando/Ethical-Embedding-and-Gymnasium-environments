@@ -59,14 +59,14 @@ def new_weight(v,S):
 
     return  weight_vector
 
-def OLS3(env,gamma=0.7, iterations=1000000 , episodes=25 ):
+def OLS3(env,gamma=0.7,epsilon=0.5,alfa=0.7,iterations=1000000,episodes=25 ):
     S = []
     W = []
     print(gamma)
 
     q = Q_.PriorityQueue()
     q.put((-9999, [1, 0]))
-    q.put((-9999, [0.01, 0.99 ]))  # <---- Por que tendria que ser [0,1]
+    q.put((-9999, [0.01, 0.99 ]))  # <---- Por que , tendria que ser [0,1]
 
     print(">> Iniciando OLS3...")
 
@@ -74,8 +74,9 @@ def OLS3(env,gamma=0.7, iterations=1000000 , episodes=25 ):
         weight_vector = q.get()[1]
         print(f"\nEvaluando vector de pesos: {weight_vector}")
 
-        Q = Q_learning(env,weight_vector,gamma,iterations)
-        pi = get_pi(env,Q)
+        Q , _ = Q_learning2(env,weight_vector,gamma,epsilon,alfa,iterations)
+        pi = get_pi2(env,Q)
+        #print(episodes)
         v1, v2 = get_V0s(env, pi, weight_vector,gamma,episodes)
 
         vs = [v1, v2]

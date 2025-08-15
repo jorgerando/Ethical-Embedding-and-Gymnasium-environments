@@ -8,12 +8,16 @@ from gymnasium_envs.Doors import *
 if __name__ == '__main__':
 
     ITERATIONS = 80000
+
     GAMMA = 1.0
+    EPSILON = 0.5
+    ALFA = 0.7
+
     EPISODES = 10
 
     env = GymDoors()
     #Calculo del convex hull
-    S = OLS3(env , gamma=GAMMA, iterations=ITERATIONS ,episodes=EPISODES)
+    S = OLS3(env , gamma=GAMMA , epsilon=EPSILON , alfa=ALFA, iterations=ITERATIONS ,episodes=EPISODES)
 
     # extraccion de las politicas eticas obtimas
     S_ = ethical_optimal_extraction(S)

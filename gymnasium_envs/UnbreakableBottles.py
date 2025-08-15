@@ -8,6 +8,8 @@ from gymnasium.core import ActType, ObsType, RenderFrame
 import sys
 import time
 import os
+import pygame
+from pygame_emojis import load_emoji
 
 class UnbreakableBottles:
 
@@ -19,7 +21,7 @@ class UnbreakableBottles:
 
     MAX_BOTTLES = 2
     BOTTLES_TO_DELIVER = 2
-    DROP_PROBABILITY = 0.1
+    DROP_PROBABILITY = 0.1 # 0.1
 
     # define the ordering of the objectives
     NUM_OBJECTIVES = 3
@@ -180,6 +182,7 @@ class GymUnbreakableBottles(UnbreakableBottles, gym.Env):
     }
 
     def __init__(self, mode: str = "scalarised", we: float = 3.0, normalised_obs: bool = True):
+
         super(GymUnbreakableBottles, self).__init__()
         super().__init__()
         self.mode = mode
@@ -190,6 +193,10 @@ class GymUnbreakableBottles(UnbreakableBottles, gym.Env):
         self.normalised_obs = normalised_obs
         self.observation_space = gym.spaces.Box(low=0, high=1, shape=(4,), dtype=np.float32) if self.normalised_obs else gym.spaces.MultiDiscrete([5, 3, 2, 2**3])
         self.action_space = gym.spaces.Discrete(3)
+
+        # render
+        self.window = None
+        self.windows_size = 300
 
     def step(
             self, action: ActType
@@ -202,19 +209,18 @@ class GymUnbreakableBottles(UnbreakableBottles, gym.Env):
         tm = self.is_terminal()
 
         r0 = 0 if not (tm or tr) else -50*self.bottles_on_floor
-        r1 = -1+self.bottles_delivered_this_step*25
+        r1 = -1 + self.bottles_delivered_this_step*25
 
         if self.mode == "scalarised":
-            rewards = float(r0*self.WS[1] + r1*self.WS[0] )
+            rewards = float(r0*self.WS[1] + r1*self.WS[0])
         else:
             rewards = np.array([r0, r1]).astype(np.float32)
 
         info = {'Individual': r1 ,'Etical': r0}
 
+
         return tuple(self.prep_obs(observation)), rewards, tm or tr , False , info
 
-    def render(self) -> RenderFrame | list[RenderFrame] | None:
-        return self.visualise_environment()
 
     def prep_obs(self, obs):
         obs = np.array([obs[0], obs[1], obs[3], 2**obs[2][0] + 2**obs[2][1] + 2**obs[2][2]] )
@@ -222,6 +228,74 @@ class GymUnbreakableBottles(UnbreakableBottles, gym.Env):
             return obs / np.array([5 - 1, 3 - 1, 2 - 1, 2 ** 3 - 1])
         return obs
 
+    def render(self) -> RenderFrame | list[RenderFrame] | None:
+        if self.window is None :
+         pygame.init()
+         pygame.display.init()
+         self.window = pygame.display.set_mode((5*self.windows_size ,3*self.windows_size ))
+         my_font = pygame.font.SysFont('Comic Sans MS', 30)
+         pygame.display.set_caption("UnbreakableBottles 🍹 🤖 🌴")
+         self.clock = pygame.time.Clock()
+
+        self.window.fill((255,255,255))
+
+        for event in pygame.event.get():
+         if event.type == pygame.QUIT:
+          pygame.quit()
+          sys.exit()
+
+        self.visualise_environment()
+        size = (self.windows_size,self.windows_size)
+        surface = load_emoji('🏁', size)
+        self.window.blit(surface, (4*self.windows_size,self.windows_size))
+
+        for x in range(5):
+
+            surface = load_emoji('⬜', size)
+
+            self.window.blit(surface, (x*self.windows_size,self.windows_size))
+
+        surface = load_emoji('🏪', size)
+        self.window.blit(surface, (0*self.windows_size,self.windows_size*1.5))
+
+        surface = load_emoji('🏁', size)
+        self.window.blit(surface, (4*self.windows_size,self.windows_size*0))
+
+        surface = load_emoji('🤖', size)
+
+        self.window.blit(surface, (self.agent_location*self.windows_size,self.windows_size))
+
+        size = (self.windows_size/2,self.windows_size/2)
+
+        for i in range(self.bottles_carried  ) :
+
+         surface = load_emoji('🍺', size)
+         d = self.windows_size * 0.5
+         self.window.blit(surface, (self.agent_location*self.windows_size + i * d ,self.windows_size/2))
+
+
+        if self.num_bottles[0] > 0 :
+            surface = load_emoji('🍺', size)
+            self.window.blit(surface, (self.windows_size * 1 + self.windows_size/4  ,self.windows_size*2))
+
+        if self.num_bottles[1] > 0 :
+            surface = load_emoji('🍺', size)
+
+            self.window.blit(surface, (self.windows_size * 2 + self.windows_size/4 ,self.windows_size*2))
+
+        if self.num_bottles[2] > 0 :
+            surface = load_emoji('🍺', size)
+            self.window.blit(surface, (self.windows_size * 3 + self.windows_size/4  ,self.windows_size*2))
+
+
+        for i in range(self.bottles_delivered  ) :
+
+         surface = load_emoji('🍺', size)
+         d = self.windows_size * 0.5
+         self.window.blit(surface, (4*self.windows_size + i * d ,self.windows_size * 2))
+
+        pygame.display.flip()
+        self.clock.tick(30)
 
     def reset(
             self,

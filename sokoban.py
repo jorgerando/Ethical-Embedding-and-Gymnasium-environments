@@ -6,14 +6,18 @@ from OLS_Embding import *
 from gymnasium_envs.Sokoban import *
 
 ITERATIONS = 80000
+
 GAMMA = 1.0
+EPSILON = 0.5
+ALFA = 0.7
+
 EPISODES = 10
 
 if __name__ == '__main__':
 
     env = GymSokoban()
     #Calculo del convex hull
-    S = OLS3(env , gamma=GAMMA, iterations=ITERATIONS ,episodes=EPISODES)
+    S = OLS3(env , gamma=GAMMA , epsilon=EPSILON , alfa=ALFA, iterations=ITERATIONS ,episodes=EPISODES)
 
     # extraccion de las politicas eticas obtimas
     S_ = ethical_optimal_extraction(S)
@@ -24,8 +28,8 @@ if __name__ == '__main__':
     w+=0.01
     print("Peso etico :" , w)
 
-    Q = Q_learning(env,[1-w,w],gamma=GAMMA)
-    pi = get_pi(env,Q)
+    Q , _ = Q_learning2(env,[1-w,w],gamma=GAMMA , epsilon=EPSILON , alfa=ALFA)
+    pi = get_pi2(env,Q)
 
     st , _ = env.reset()
     actions = []
