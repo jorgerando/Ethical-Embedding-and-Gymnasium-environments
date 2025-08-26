@@ -13,7 +13,7 @@ pip install -r requirements.txt
 
 ### Civity Game
 
-Ethical weight : 0.7 + &Delta
+Ethical weight : 0.7 + &delta
 
 ![CivityGame](https://github.com/user-attachments/assets/e321a39a-a5b9-4f95-ae39-97c432d9bc31)
 
