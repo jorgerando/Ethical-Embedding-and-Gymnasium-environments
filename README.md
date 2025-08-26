@@ -1,6 +1,5 @@
 # Ethical-Embedding-and-Gymnasium-environments
 
-Este es un proyecto que hace **X cosa** (describe brevemente tu repo aquí).
 
 ## 📦 Installation
 
