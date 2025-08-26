@@ -15,10 +15,10 @@ pip install -r requirements.txt
 Ethical weight : 0.7 + delta
 ![CivityGame](https://github.com/user-attachments/assets/d1d19553-9f8c-4a05-a9ea-3b5ab70453c5)
 ### Doors 
-Ethical weight : 0.7 + delta
+Ethical weight : 0.1 + delta
 ![Doors](https://github.com/user-attachments/assets/eae1cb27-56ac-4edb-9346-78e3502cbcbb)
 ### Sokoban 
-Ethical weight : 0.7 + delta
+Ethical weight : 0.17 + delta
 ![sokoban](https://github.com/user-attachments/assets/224683fc-cb21-4d05-a41e-03135039a02a)
 ### UnBreak 
 Ethical weight : 0.0 + delta
