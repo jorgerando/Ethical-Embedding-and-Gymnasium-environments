@@ -1,21 +1,21 @@
 import sys
-sys.path.insert(0, 'algorithms/.')
+
+sys.path.insert(0, '../algorithms/.')
 from Q_learning import *
 from OLS_Embding import *
 
-from gymnasium_envs.BreakableBottles import *
+sys.path.insert(0, '../gymnasium_envs/.')
+from UnbreakableBottles import *
 
 ITERATIONS = 25000
-
 GAMMA = 0.9
 EPSILON = 0.5
-ALFA = 0.1
-
-EPISODES = 10
+ALFA = 0.7
+EPISODES = 25
 
 if __name__ == '__main__':
 
-    env = GymBreakableBottles()
+    env = GymUnbreakableBottles()
     #Calculo del convex hull
     S = OLS3(env , gamma=GAMMA , epsilon=EPSILON , alfa=ALFA, iterations=ITERATIONS ,episodes=EPISODES)
 
@@ -27,12 +27,11 @@ if __name__ == '__main__':
     w = ethical_embedding_state(S_)
     w+=0.01
 
-    env = GymBreakableBottles()
-
+    env = GymUnbreakableBottles()
     print("Peso etico :" , w)
 
-    Q , _ = Q_learning2(env,[1-w,w],gamma=GAMMA , epsilon=EPSILON , alfa=ALFA)
-    pi = get_pi2(env,Q)
+    Q , _ = Q_learning(env,[1-w,w],gamma=GAMMA , epsilon=EPSILON , alfa=ALFA)
+    pi = get_pi(env,Q)
 
     st , _ = env.reset()
     actions = []

@@ -11,6 +11,8 @@ import os
 import pygame
 from pygame_emojis import load_emoji
 
+from gymnasium.utils.env_checker import check_env
+
 class UnbreakableBottles:
 
     NUM_CELLS = 5
@@ -181,7 +183,7 @@ class GymUnbreakableBottles(UnbreakableBottles, gym.Env):
         "pick_up_bottle": 2
     }
 
-    def __init__(self, mode: str = "scalarised", we: float = 3.0, normalised_obs: bool = True):
+    def __init__(self, mode: str = "scalarised",WS=[1,1] , we: float = 3.0, normalised_obs: bool = True):
 
         super(GymUnbreakableBottles, self).__init__()
         super().__init__()
@@ -191,12 +193,13 @@ class GymUnbreakableBottles(UnbreakableBottles, gym.Env):
         self.step_count = 0
         self.max_steps = 50
         self.normalised_obs = normalised_obs
-        self.observation_space = gym.spaces.Box(low=0, high=1, shape=(4,), dtype=np.float32) if self.normalised_obs else gym.spaces.MultiDiscrete([5, 3, 2, 2**3])
+        self.observation_space = gym.spaces.Box(low=0, high=1, shape=(4,), dtype=np.float64) if self.normalised_obs else gym.spaces.MultiDiscrete([5, 3, 2, 2**3])
         self.action_space = gym.spaces.Discrete(3)
 
         # render
         self.window = None
         self.windows_size = 300
+        self.WS = WS
 
     def step(
             self, action: ActType
@@ -219,7 +222,7 @@ class GymUnbreakableBottles(UnbreakableBottles, gym.Env):
         info = {'Individual': r1 ,'Etical': r0}
 
 
-        return tuple(self.prep_obs(observation)), rewards, tm or tr , False , info
+        return np.array(self.prep_obs(observation)), rewards, tm or tr , False , info
 
 
     def prep_obs(self, obs):
@@ -303,13 +306,24 @@ class GymUnbreakableBottles(UnbreakableBottles, gym.Env):
             seed: int | None = None,
             options: dict[str, Any] | None = None,
     ) -> tuple[ObsType, dict[str, Any]]:
+
+        super().reset(seed=seed)
+
         if seed is not None:
             self.rng = default_rng(seed=seed)
         self.step_count = 0
         self.env_clean_up()
         self.env_init()
-        return tuple(self.prep_obs(self.env_start())), {}
+        return np.array(self.prep_obs(self.env_start())), {}
 
     def setWeights(self,WS):
         self.we  = WS[1]
         self.WS = WS
+'''
+env = GymUnbreakableBottles()
+try:
+    check_env(env)
+    print("Environment passes all checks!")
+except Exception as e:
+    print(f"Environment has issues: {e}")
+'''

@@ -19,7 +19,7 @@ def get_V0s(env,pi,WS,gamma=0.7,episodes=25):
 
      while not done :
 
-        a = pi[s]
+        a = pi[tuple(s)]
         s , _ , done , _ , info = env.step(a)
 
         r1 = info['Individual']
@@ -29,15 +29,12 @@ def get_V0s(env,pi,WS,gamma=0.7,episodes=25):
         RE += gamma**(C-1) * r2
 
         C+=1
-        #print("u")
 
         if done :
-            #print("Fin del episodio")
             RI_T += RI
             RE_T += RE
             s , _ = env.reset()
             env.setWeights(WS)
-            #print("fin")
             break
 
     return RI_T/episodes , RE_T/episodes
@@ -62,8 +59,7 @@ def new_weight(v,S):
 def OLS3(env,gamma=0.7,epsilon=0.5,alfa=0.7,iterations=1000000,episodes=25 ):
     S = []
     W = []
-    print(gamma)
-
+    
     q = Q_.PriorityQueue()
     q.put((-9999, [1, 0]))
     q.put((-9999, [0.01, 0.99 ]))  # <---- Por que , tendria que ser [0,1]
@@ -74,8 +70,8 @@ def OLS3(env,gamma=0.7,epsilon=0.5,alfa=0.7,iterations=1000000,episodes=25 ):
         weight_vector = q.get()[1]
         print(f"\nEvaluando vector de pesos: {weight_vector}")
 
-        Q , _ = Q_learning2(env,weight_vector,gamma,epsilon,alfa,iterations)
-        pi = get_pi2(env,Q)
+        Q , _ = Q_learning(env,weight_vector,gamma,epsilon,alfa,iterations,episodes)
+        pi = get_pi(env,Q)
         #print(episodes)
         v1, v2 = get_V0s(env, pi, weight_vector,gamma,episodes)
 

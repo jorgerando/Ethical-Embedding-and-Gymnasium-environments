@@ -11,20 +11,19 @@ import random
 
 import collections
 
-ITERATIONS = 5000
+ITERATIONS = 10000
 EPISODES = 100
 GAMMA = 0.9
 EPSILON = 0.5
 ALFA = 0.2
-WS = [1,1]
+WS = [None,None]
 
 env = gym.make('FrozenLake-v1', desc=None, map_name="4x4", is_slippery=True )
-env = GymUnbreakableBottles()
 
-Q , _ = Q_learning2(env,WS,gamma=GAMMA,epsilon=EPSILON,alfa=ALFA,iterations=ITERATIONS)
-
+Q , _ = Q_learning(env,WS,gamma=GAMMA,epsilon=EPSILON,alfa=ALFA,iterations=ITERATIONS)
 pi = get_pi(env,Q)
 
+env = gym.make('FrozenLake-v1', desc=None, map_name="4x4", is_slippery=True ,render_mode="human")
 state , _ = env.reset()
 
 while True:

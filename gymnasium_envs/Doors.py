@@ -11,6 +11,9 @@ import os
 import pygame
 from pygame_emojis import load_emoji
 
+import gymnasium as gym
+from gymnasium.utils.env_checker import check_env
+
 class Environment:
 
     # define the structure of the environment - 14 cells laid out as below, with doors between cells 0 / 1 and 2 / 3.
@@ -178,7 +181,6 @@ class Environment:
         ["s_" if self.door23_char() == "O" else "*",self.cell_char(4),self.cell_char(13),self.cell_char(12),self.cell_char(11),"*"],
         ["*"," ","*","*","*","*"]]
 
-
 class GymDoors(Environment, gym.Env):
     """
     A Gymnasium environment for the Doors problem.
@@ -202,7 +204,7 @@ class GymDoors(Environment, gym.Env):
         "toggle_door": 4,
     }
 
-    def __init__(self, mode:str="scalarised", we:float=3.0, normalised_obs: bool = True):
+    def __init__(self, mode:str="scalarised",WS=[1,1] , we:float=3.0, normalised_obs: bool = True):
         super(GymDoors, self).__init__()
         super().__init__()
         self.normalised_obs = normalised_obs
@@ -218,6 +220,7 @@ class GymDoors(Environment, gym.Env):
         # render
         self.window = None
         self.windows_size = 250
+        self.WS = WS
 
     def reset(
         self,
@@ -226,9 +229,12 @@ class GymDoors(Environment, gym.Env):
         options: dict[str, Any] | None = None,
     ) -> tuple[ObsType, dict[str, Any]]:
 
+        super().reset(seed=seed)
+
         obs = self.env_start()
+        obs = self.prep_obs(obs)
         self.step_count = 0
-        return tuple(obs) , {}
+        return np.array(obs) , {}
 
     def render(self) -> RenderFrame | list[RenderFrame] | None:
 
@@ -296,6 +302,7 @@ class GymDoors(Environment, gym.Env):
         self.clock.tick(30)
 
     def step(self, action: ActType) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
+
         if not isinstance(action, str):
             action = self.action2string[action]
 
@@ -314,7 +321,7 @@ class GymDoors(Environment, gym.Env):
 
         info = {'Individual': r1 ,'Etical': r0}
         self.step_count+= 1
-        return tuple(observation) , reward, tm or tr , False , info
+        return np.array(observation) , reward, tm or tr , False , info
 
 
     def prep_obs(self, obs):
@@ -326,3 +333,12 @@ class GymDoors(Environment, gym.Env):
     def setWeights(self,WS):
         self.we  = WS[1]
         self.WS = WS
+
+'''
+env = GymDoors()
+try:
+    check_env(env)
+    print("Environment passes all checks!")
+except Exception as e:
+    print(f"Environment has issues: {e}")
+'''

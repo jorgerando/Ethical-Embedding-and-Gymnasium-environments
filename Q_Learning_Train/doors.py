@@ -1,19 +1,19 @@
 import sys
-sys.path.insert(0, 'algorithms/.')
+
+sys.path.insert(0, '../algorithms/.')
 from Q_learning import *
 from OLS_Embding import *
 
-from gymnasium_envs.Doors import *
+sys.path.insert(0, '../gymnasium_envs/.')
+from Doors import *
 
 if __name__ == '__main__':
 
-    ITERATIONS = 80000
-
+    ITERATIONS = 10000
     GAMMA = 1.0
     EPSILON = 0.5
     ALFA = 0.7
-
-    EPISODES = 10
+    EPISODES = 25
 
     env = GymDoors()
     #Calculo del convex hull
@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
     #w = 2.1 PESOS DE MANEL
 
-    Q = Q_learning(env,[1-w,w],gamma=GAMMA)
+    Q , _ = Q_learning(env,[1-w,w],gamma=GAMMA)
     pi = get_pi(env,Q)
 
     st , _ = env.reset()
@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     while True:
 
-      at = pi[st]
+      at = pi[tuple(st)]
       str_a = env.action2string[int(at)]
       actions.append(str_a)
       st_n, r, done ,  _ , _ = env.step(at)

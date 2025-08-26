@@ -1,0 +1,6 @@
+gym==0.26.2
+gymnasium==1.0.0
+numpy==2.3.2
+pygame==2.6.0
+pygame_emojis==0.1.1
+stable_baselines3==2.4.0

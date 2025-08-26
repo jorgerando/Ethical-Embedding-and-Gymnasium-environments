@@ -12,6 +12,8 @@ import os
 import pygame
 from pygame_emojis import load_emoji
 
+from gymnasium.utils.env_checker import check_env
+
 class BreakableBottles:
 
     NUM_CELLS = 5
@@ -163,8 +165,7 @@ class BreakableBottles:
         print('----------------------------------')
 
 
-
-class GymBreakableBottles(BreakableBottles, gym.Env):
+class GymBreakableBottles(gym.Env,BreakableBottles):
     metadata = {'render.modes': ['human']}
 
     action2string = {
@@ -179,7 +180,7 @@ class GymBreakableBottles(BreakableBottles, gym.Env):
         "pick_up_bottle": 2
     }
 
-    def __init__(self, mode:str="scalarised", we:float=3.0, normalised_obs: bool = True):
+    def __init__(self, mode:str="scalarised", WS=[1,1], we:float=3.0, normalised_obs: bool = True):
         super(GymBreakableBottles, self).__init__()
         super().__init__()
         self.normalised_obs = normalised_obs
@@ -193,6 +194,7 @@ class GymBreakableBottles(BreakableBottles, gym.Env):
         # render
         self.window = None
         self.windows_size = 300
+        self.WS = WS
 
     def step(
         self, action: ActType
@@ -214,7 +216,7 @@ class GymBreakableBottles(BreakableBottles, gym.Env):
 
         info = {'Individual': r1 ,'Etical': r0}
 
-        return tuple(self.prep_obs(observation)), rewards, tm or tr, False , info
+        return np.array(self.prep_obs(observation)) , rewards, tm or tr, False , info
 
     def render(self) -> RenderFrame | list[RenderFrame] | None:
         return self.visualise_environment()
@@ -300,13 +302,25 @@ class GymBreakableBottles(BreakableBottles, gym.Env):
             seed: int | None = None,
             options: dict[str, Any] | None = None,
     ) -> tuple[ObsType, dict[str, Any]]:
+
+        super().reset(seed=seed)
+
         if seed is not None:
             self.rng = default_rng(seed=seed)
         self.step_count = 0
         self.env_clean_up()
         self.env_init()
-        return tuple(self.prep_obs(self.env_start())), {}
+        return np.array(self.prep_obs(self.env_start())), {}
 
     def setWeights(self,WS):
         self.we  = WS[1]
         self.WS = WS
+
+'''
+env = GymBreakableBottles()
+try:
+    check_env(env)
+    print("Environment passes all checks!")
+except Exception as e:
+    print(f"Environment has issues: {e}")
+'''
