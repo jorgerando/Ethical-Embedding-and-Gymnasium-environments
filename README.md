@@ -2,7 +2,7 @@
 
 Este es un proyecto que hace **X cosa** (describe brevemente tu repo aquí).
 
-## 📦 Instalación
+## 📦 Installation
 
 ```bash
 git clone --recursive https://github.com/jorgerando/Ethical-Embedding-and-Gymnasium-environments.git
