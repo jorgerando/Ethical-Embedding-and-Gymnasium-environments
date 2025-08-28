@@ -8,7 +8,7 @@ git clone --recursive https://github.com/jorgerando/Ethical-Embedding-and-Gymnas
 cd Ethical-Embedding-and-Gymnasium-environments
 pip install -r requirements.txt
 ```
-## Gymnasion enviroments ethical policies
+## Gymnasion enviroments ethical policies (Q-learning)
 
 ### Civility game
 Ethical weight : 0.7 + delta
