@@ -11,7 +11,7 @@ pip install -r requirements.txt
 ## Gymnasion enviroments ethical policies (Q-learning)
 
 ### Ver las politicas 
-⚠️ No se lanza el entrenmiento solo sale el render con la política ⚠️
+⚠️ No se lanza el entrenamiento solo sale el render con la política ⚠️
 ```bash
 cd Ethical-Embedding-and-Gymnasium-environments/Q_Learning_Solve
 python3 ***env***
