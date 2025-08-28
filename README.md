@@ -10,6 +10,13 @@ pip install -r requirements.txt
 ```
 ## Gymnasion enviroments ethical policies (Q-learning)
 
+### Ver las politicas 
+⚠️ No se lanza el entrenmiento solo sale el render con la política ⚠️
+```bash
+cd Ethical-Embedding-and-Gymnasium-environments/Q_Learning_Solve
+python3 ***env***
+```
+
 ### Civility game
 Ethical weight : 0.7 + delta
 ![CivityGame](https://github.com/user-attachments/assets/d1d19553-9f8c-4a05-a9ea-3b5ab70453c5)
