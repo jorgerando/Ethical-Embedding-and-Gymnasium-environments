@@ -13,7 +13,7 @@ pip install -r requirements.txt
 ### Ver las politicas 
 ⚠️ No se lanza el entrenamiento solo sale el render con la política ⚠️
 ```bash
-cd Ethical-Embedding-and-Gymnasium-environments/Q_Learning_Solve
+cd Ethical-Embedding-and-Gymnasium-environments/Q_Learning_Solve #importante estar en el directorio
 python3 ***env***
 ```
 
