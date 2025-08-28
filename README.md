@@ -10,7 +10,7 @@ pip install -r requirements.txt
 ```
 ## Gymnasion enviroments ethical policies
 
-### Civity Game
+### Civility game
 Ethical weight : 0.7 + delta
 ![CivityGame](https://github.com/user-attachments/assets/d1d19553-9f8c-4a05-a9ea-3b5ab70453c5)
 ### Doors 
